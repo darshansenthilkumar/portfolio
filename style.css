@@ -1,0 +1,374 @@
+/* ========================================================
+   OBSIDIAN CYBERNETIC PORTFOLIO DESIGN SYSTEM
+   Theme: Dynamic Obsidian Cybernetic (Dark & Light Mode)
+   ======================================================== */
+
+:root {
+  /* DARK THEME (DEFAULT) */
+  --canvas: #050814;
+  --surface: #0d1322;
+  --surface-low: #151b2b;
+  --surface-container: #191f2f;
+  --surface-high: #242a3a;
+  --surface-highest: #2f3445;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-tertiary: #64748b;
+
+  --electric-blue: #0066ff;
+  --electric-blue-hover: #2563eb;
+  --cyan-accent: #06b6d4;
+  --cyan-bright: #22d3ee;
+  --sky-accent: #38bdf8;
+
+  --glass-fill: rgba(15, 23, 42, 0.72);
+  --glass-border: rgba(56, 189, 248, 0.2);
+  --glass-glow: rgba(0, 102, 255, 0.25);
+
+  --grid-line: rgba(56, 189, 248, 0.07);
+  --card-bg: #0b1222;
+  --card-border: #1e293b;
+  --ticker-bg: #070b16;
+}
+
+/* LIGHT THEME TOKENS */
+[data-theme="light"] {
+  --canvas: #f8fafc;
+  --surface: #ffffff;
+  --surface-low: #f1f5f9;
+  --surface-container: #e2e8f0;
+  --surface-high: #cbd5e1;
+  --surface-highest: #94a3b8;
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #64748b;
+
+  --electric-blue: #0052cc;
+  --electric-blue-hover: #0066ff;
+  --cyan-accent: #0891b2;
+  --cyan-bright: #0284c7;
+  --sky-accent: #0284c7;
+
+  --glass-fill: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(14, 165, 233, 0.25);
+  --glass-glow: rgba(0, 82, 204, 0.12);
+
+  --grid-line: rgba(14, 165, 233, 0.08);
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
+  --ticker-bg: #f1f5f9;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.15s ease;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--canvas);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* Typography Classes */
+.font-heading {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Scroll Progress Bar at Top */
+#scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #0066ff, #06b6d4, #22d3ee);
+  z-index: 100;
+  transition: width 0.1s ease-out;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.6);
+}
+
+/* Cyber Cursor & Halo Follower */
+@media (pointer: fine) {
+  body {
+    cursor: default;
+  }
+}
+
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  background-color: var(--cyan-bright);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: width 0.15s ease, height 0.15s ease, background-color 0.2s ease;
+  box-shadow: 0 0 10px var(--cyan-bright);
+}
+
+.cursor-halo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid var(--cyan-bright);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1), height 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+  opacity: 0.7;
+}
+
+.cursor-hover .cursor-dot {
+  width: 12px;
+  height: 12px;
+  background-color: var(--electric-blue);
+}
+
+.cursor-hover .cursor-halo {
+  width: 52px;
+  height: 52px;
+  border-color: var(--electric-blue);
+  background-color: rgba(0, 102, 255, 0.08);
+}
+
+/* Click Ripple Wave */
+.click-ripple {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0);
+  animation: ripple-expand 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+  z-index: 9990;
+  border: 2px solid var(--cyan-bright);
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.25) 0%, transparent 70%);
+}
+
+@keyframes ripple-expand {
+  0% {
+    width: 0px;
+    height: 0px;
+    opacity: 1;
+  }
+
+  100% {
+    width: 140px;
+    height: 140px;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Cybernetic Grid Background */
+.bg-cyber-grid {
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+
+/* Radar Scan */
+@keyframes radar-scan {
+  0% {
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+.bg-radar-scan {
+  background: linear-gradient(180deg,
+      transparent 0%,
+      rgba(6, 182, 212, 0.08) 50%,
+      rgba(6, 182, 212, 0.3) 98%,
+      rgba(34, 211, 238, 0.7) 100%);
+  animation: radar-scan 3.2s linear infinite;
+}
+
+.scanlines-overlay {
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  background-size: 100% 3px, 6px 100%;
+  pointer-events: none;
+}
+
+/* Border Glow Animation */
+@keyframes border-glow {
+
+  0%,
+  100% {
+    border-color: rgba(6, 182, 212, 0.4);
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.2), inset 0 0 15px rgba(0, 102, 255, 0.1);
+  }
+
+  50% {
+    border-color: rgba(0, 102, 255, 0.6);
+    box-shadow: 0 0 30px rgba(0, 102, 255, 0.3), inset 0 0 20px rgba(6, 182, 212, 0.15);
+  }
+}
+
+.animate-border-glow {
+  animation: border-glow 4s ease-in-out infinite;
+}
+
+/* Glassmorphism Panels */
+.glass-panel {
+  background: var(--glass-fill);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  transform-style: preserve-3d;
+}
+
+.glass-panel:hover {
+  border-color: rgba(6, 182, 212, 0.5);
+  box-shadow: 0 0 24px -4px var(--glass-glow), 0 8px 16px -2px rgba(6, 182, 212, 0.15);
+}
+
+/* 3D Tilt Card Container */
+.tilt-card {
+  perspective: 1000px;
+}
+
+/* Corner Brackets for Biometric Frame */
+.corner-bracket-tl {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: 14px;
+  height: 14px;
+  border-top: 2.5px solid var(--cyan-bright);
+  border-left: 2.5px solid var(--cyan-bright);
+}
+
+.corner-bracket-tr {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 14px;
+  height: 14px;
+  border-top: 2.5px solid var(--cyan-bright);
+  border-right: 2.5px solid var(--cyan-bright);
+}
+
+.corner-bracket-bl {
+  position: absolute;
+  bottom: -2px;
+  left: -2px;
+  width: 14px;
+  height: 14px;
+  border-bottom: 2.5px solid var(--cyan-bright);
+  border-left: 2.5px solid var(--cyan-bright);
+}
+
+.corner-bracket-br {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 14px;
+  height: 14px;
+  border-bottom: 2.5px solid var(--cyan-bright);
+  border-right: 2.5px solid var(--cyan-bright);
+}
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.6rem;
+  background-color: var(--surface-low);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.badge:hover {
+  border-color: var(--cyan-accent);
+  color: var(--cyan-bright);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(6, 182, 212, 0.25);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--canvas);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--surface-highest);
+  border-radius: 4px;
+  border: 1px solid var(--glass-border);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cyan-accent);
+}
+
+/* Shimmer on Photo Card */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+.photo-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(34, 211, 238, 0.12) 50%,
+      transparent 100%);
+  transform: translateX(-100%);
+  animation: shimmer 5s infinite;
+  pointer-events: none;
+}
+
+/* Scroll Fade In Animation */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
