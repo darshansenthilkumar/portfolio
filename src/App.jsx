@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import TiltCard from './components/TiltCard';
 import WorkflowSection from './components/WorkflowSection';
+import Aurora from './components/Aurora';
+import AnimatedContent from './components/AnimatedContent';
+import GradientText from './components/GradientText';
+import GlassSurface from './components/GlassSurface';
 
 // Web Audio synthesizer for tactile sci-fi sound feedback
 let audioCtx = null;
@@ -50,7 +54,8 @@ export default function App() {
     { type: 'info', text: "Type 'help' to view available subroutines, or use quick action chips below." }
   ]);
   const [terminalInput, setTerminalInput] = useState('');
-  const terminalBottomRef = useRef(null);
+  const terminalContainerRef = useRef(null);
+  const profilePhotoRef = useRef(null);
 
   // Contact form
   const [formStatus, setFormStatus] = useState('idle');
@@ -161,10 +166,15 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
-  // Auto scroll terminal
+  // Ensure page always starts at top on initial load
   useEffect(() => {
-    if (terminalBottomRef.current) {
-      terminalBottomRef.current.scrollIntoView({ behavior: 'smooth' });
+    window.scrollTo(0, 0);
+  }, []);
+
+  // Auto scroll terminal inner container only (does NOT scroll the page window)
+  useEffect(() => {
+    if (terminalContainerRef.current) {
+      terminalContainerRef.current.scrollTop = terminalContainerRef.current.scrollHeight;
     }
   }, [terminalHistory]);
 
@@ -426,331 +436,315 @@ Status  : Open for Engineering Roles & Cybersecurity Inquiries`
   };
 
   return (
-    <div className="min-h-screen relative flex flex-col justify-between selection:bg-cyan-500 selection:text-black">
-      {/* Background Gradients */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute inset-0 bg-cyber-grid opacity-60"></div>
-        <div className="absolute top-[-10%] left-[25%] w-[600px] h-[600px] bg-electric-blue/10 rounded-full blur-[160px]"></div>
-        <div className="absolute top-[35%] right-[-10%] w-[500px] h-[500px] bg-cyan-accent/8 rounded-full blur-[180px]"></div>
-        <div className="absolute bottom-[5%] left-[5%] w-[600px] h-[600px] bg-blue-900/10 rounded-full blur-[180px]"></div>
+    <div className="min-h-screen relative flex flex-col justify-between selection:bg-white selection:text-black">
+      {/* Background Aurora Canvas from React Bits */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <Aurora
+          colorStops={["#7cff67", "#B497CF", "#5227FF"]}
+          blend={0.5}
+          amplitude={1.0}
+          speed={0.5}
+        />
+        <div className="absolute inset-0 bg-black/40 pointer-events-none"></div>
+        <div className="absolute inset-0 bg-cyber-grid opacity-15 pointer-events-none"></div>
       </div>
 
-      {/* Telemetry Top Bar */}
-      <div className="relative z-50 border-b border-slate-800/80 bg-[var(--ticker-bg)]/95 backdrop-blur-md px-4 py-1.5 text-[11px] font-mono flex items-center justify-between text-slate-400">
-        <div className="flex items-center gap-3">
-          <span className="flex items-center gap-1.5 text-cyan-400 font-semibold">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-            SYSTEM_NODE: ONLINE
-          </span>
-          <span className="hidden sm:inline text-slate-600">|</span>
-          <span className="hidden sm:inline text-slate-400">TOPOLOGY: CISCO_TIER3_CORE</span>
-          <span className="hidden md:inline text-slate-600">|</span>
-          <span className="hidden md:inline text-slate-400">RTT: <span className="text-cyan-400 font-semibold">{ping}ms</span></span>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <span className="hidden sm:inline text-slate-400">CCNA CERTIFIED // CYBERSECURITY ENTHUSIAST</span>
-          
-          <button 
-            onClick={() => { setSoundEnabled(!soundEnabled); triggerSound(800); }}
-            className="text-slate-400 hover:text-cyan-300 flex items-center gap-1 cursor-pointer transition-colors"
-            title="Toggle UI synthesized sound effects"
-          >
-            <span>[AUDIO: {soundEnabled ? 'ON 🔊' : 'MUTED 🔇'}]</span>
-          </button>
-
-          <button
-            onClick={toggleTheme}
-            className="px-2 py-0.5 rounded border border-slate-700 hover:border-cyan-400 bg-slate-800/60 hover:bg-slate-700/60 text-slate-300 hover:text-cyan-300 transition-all flex items-center gap-1.5 cursor-pointer font-mono text-[11px]"
-            title="Switch between Light and Dark mode"
-          >
-            {theme === 'dark' ? <span>☀️ LIGHT</span> : <span>🌙 DARK</span>}
-          </button>
-        </div>
-      </div>
-
-      {/* Main Navigation */}
-      <header className="sticky top-0 z-40 border-b border-slate-800/80 bg-[var(--surface)]/90 backdrop-blur-xl transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
-          <a href="#hero" onClick={() => triggerSound(900)} className="group flex items-center gap-3.5 text-decoration-none">
-            <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-blue-600 via-cyan-500 to-sky-400 p-[1.5px] shadow-lg shadow-blue-600/20 group-hover:shadow-cyan-400/40 transition-all">
-              <img 
-                src="/profile.jpg" 
-                alt="Darshan S" 
-                className="w-full h-full object-cover rounded-[10px] filter contrast-105"
-              />
-              <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 border-2 border-[var(--surface)] rounded-full"></div>
-            </div>
-            <div>
-              <div className="font-heading font-extrabold text-[var(--text-primary)] text-base tracking-wide flex items-center gap-1.5">
-                DARSHAN S
-                <span className="text-[10px] font-mono font-medium text-cyan-400 bg-cyan-950/70 border border-cyan-800/50 px-1.5 py-0.5 rounded">v2.6</span>
+      {/* Floating Navigation Bar */}
+      <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[94%] max-w-5xl transition-all">
+        <GlassSurface
+          width="100%"
+          height="auto"
+          borderRadius={999}
+          distortionScale={-180}
+          displace={0.4}
+          backgroundOpacity={0.12}
+          className="border border-zinc-800/90 shadow-2xl shadow-black/90 px-4 sm:px-6 py-1.5"
+        >
+          <div className="w-full flex items-center justify-between">
+            <a href="#hero" onClick={() => triggerSound(900)} className="group flex items-center gap-3 text-decoration-none">
+              <div className="relative w-8 h-8 rounded-full overflow-hidden border border-zinc-700 shadow-sm flex-shrink-0">
+                <img src="/profile.jpg" alt="Darshan S" className="w-full h-full object-cover" />
               </div>
-              <div className="text-[11px] font-mono text-slate-400 tracking-wider">CYBERSECURITY ENTHUSIAST &amp; CISCO CCNA ENGINEER</div>
+              <div>
+                <div className="font-heading font-extrabold text-[var(--text-primary)] text-sm tracking-wide">
+                  DARSHAN S
+                </div>
+              </div>
+            </a>
+
+            <nav className="hidden md:flex items-center gap-1 font-mono text-xs">
+              <a href="#overview" onClick={() => triggerSound(850)} className="px-3 py-1.5 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800/60 transition-all">Overview</a>
+              <a href="#workflow" onClick={() => triggerSound(850)} className="px-3 py-1.5 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800/60 transition-all">Workflow</a>
+              <a href="#projects" onClick={() => triggerSound(850)} className="px-3 py-1.5 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800/60 transition-all">Projects</a>
+              <a href="#skills" onClick={() => triggerSound(850)} className="px-3 py-1.5 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800/60 transition-all">Skills</a>
+              <a href="#credentials" onClick={() => triggerSound(850)} className="px-3 py-1.5 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800/60 transition-all">Credentials</a>
+              <a href="#terminal-section" onClick={() => triggerSound(850)} className="px-3 py-1.5 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800/60 transition-all">CLI</a>
+              <a href="#contact" onClick={() => triggerSound(850)} className="px-3 py-1.5 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800/60 transition-all">Contact</a>
+            </nav>
+
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => { setSoundEnabled(!soundEnabled); triggerSound(800); }}
+                className="text-zinc-400 hover:text-white p-1.5 rounded-full hover:bg-zinc-800/50 cursor-pointer transition-colors text-xs font-mono"
+                title="Toggle UI audio effects"
+              >
+                {soundEnabled ? '🔊' : '🔇'}
+              </button>
+
+              <a 
+                href="#contact" 
+                onClick={() => triggerSound(1100)}
+                className="hidden sm:inline-flex items-center px-4 py-1.5 rounded-full bg-white hover:bg-zinc-200 text-black font-heading font-bold text-xs tracking-wider transition-all shadow-md cursor-pointer"
+              >
+                CONNECT NOW
+              </a>
+              
+              <button 
+                onClick={() => { setMobileMenuOpen(!mobileMenuOpen); triggerSound(800); }} 
+                className="md:hidden p-1.5 rounded-full border border-zinc-800 text-zinc-300 hover:text-white"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+              </button>
             </div>
-          </a>
-
-          <nav className="hidden md:flex items-center gap-1 font-mono text-xs">
-            <a href="#overview" onClick={() => triggerSound(850)} className="px-3 py-2 rounded-md text-slate-300 hover:text-cyan-300 hover:bg-slate-800/50 transition-all">
-              <span className="text-cyan-500 mr-1">01.</span>Overview
-            </a>
-            <a href="#workflow" onClick={() => triggerSound(850)} className="px-3 py-2 rounded-md text-slate-300 hover:text-cyan-300 hover:bg-slate-800/50 transition-all">
-              <span className="text-cyan-500 mr-1">02.</span>Workflow
-            </a>
-            <a href="#projects" onClick={() => triggerSound(850)} className="px-3 py-2 rounded-md text-slate-300 hover:text-cyan-300 hover:bg-slate-800/50 transition-all">
-              <span className="text-cyan-500 mr-1">03.</span>Projects
-            </a>
-            <a href="#skills" onClick={() => triggerSound(850)} className="px-3 py-2 rounded-md text-slate-300 hover:text-cyan-300 hover:bg-slate-800/50 transition-all">
-              <span className="text-cyan-500 mr-1">04.</span>Skills
-            </a>
-            <a href="#credentials" onClick={() => triggerSound(850)} className="px-3 py-2 rounded-md text-slate-300 hover:text-cyan-300 hover:bg-slate-800/50 transition-all">
-              <span className="text-cyan-500 mr-1">05.</span>Credentials
-            </a>
-            <a href="#terminal-section" onClick={() => triggerSound(850)} className="px-3 py-2 rounded-md text-slate-300 hover:text-cyan-300 hover:bg-slate-800/50 transition-all">
-              <span className="text-cyan-500 mr-1">06.</span>CLI Terminal
-            </a>
-            <a href="#contact" onClick={() => triggerSound(850)} className="px-3 py-2 rounded-md text-slate-300 hover:text-cyan-300 hover:bg-slate-800/50 transition-all">
-              <span className="text-cyan-500 mr-1">07.</span>Contact
-            </a>
-          </nav>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg border border-slate-700 hover:border-cyan-400 text-slate-300 hover:text-cyan-300 transition-colors"
-              aria-label="Toggle theme"
-            >
-              {theme === 'dark' ? '☀️' : '🌙'}
-            </button>
-
-            <a 
-              href="#contact" 
-              onClick={() => triggerSound(1100)}
-              className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-heading font-semibold text-xs tracking-wider transition-all shadow-lg shadow-blue-600/30 hover:shadow-cyan-500/40 border border-blue-400/40 cursor-pointer"
-            >
-              <span>CONNECT NOW</span>
-            </a>
-            
-            <button 
-              onClick={() => { setMobileMenuOpen(!mobileMenuOpen); triggerSound(800); }} 
-              className="md:hidden p-2 rounded-lg border border-slate-700 text-slate-300 hover:text-white"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
-            </button>
           </div>
-        </div>
-
-        {mobileMenuOpen && (
-          <div className="md:hidden border-b border-slate-800 bg-[var(--surface-low)] px-4 py-3 space-y-1 font-mono text-sm animate-fadeIn">
-            <a href="#overview" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-cyan-400">01. Overview</a>
-            <a href="#workflow" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-cyan-400">02. Workflow</a>
-            <a href="#projects" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-cyan-400">03. Projects</a>
-            <a href="#skills" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-cyan-400">04. Skills Matrix</a>
-            <a href="#credentials" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-cyan-400">05. Credentials</a>
-            <a href="#terminal-section" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-cyan-400">06. CLI Terminal</a>
-            <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-cyan-400">07. Contact</a>
-          </div>
-        )}
+        </GlassSurface>
       </header>
+
+      {mobileMenuOpen && (
+        <div className="fixed top-18 left-1/2 -translate-x-1/2 z-50 w-[94%] max-w-sm rounded-2xl border border-zinc-800 bg-black/90 backdrop-blur-2xl p-4 space-y-2 font-mono text-xs shadow-2xl animate-fadeIn md:hidden">
+          <a href="#overview" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded-lg text-zinc-300 hover:bg-zinc-800 hover:text-white">01. Overview</a>
+          <a href="#workflow" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded-lg text-zinc-300 hover:bg-zinc-800 hover:text-white">02. Workflow</a>
+          <a href="#projects" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded-lg text-zinc-300 hover:bg-zinc-800 hover:text-white">03. Projects</a>
+          <a href="#skills" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded-lg text-zinc-300 hover:bg-zinc-800 hover:text-white">04. Skills</a>
+          <a href="#credentials" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded-lg text-zinc-300 hover:bg-zinc-800 hover:text-white">05. Credentials</a>
+          <a href="#terminal-section" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded-lg text-zinc-300 hover:bg-zinc-800 hover:text-white">06. CLI Terminal</a>
+          <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded-lg text-zinc-300 hover:bg-zinc-800 hover:text-white">07. Contact</a>
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-28">
 
-        {/* Hero Section */}
-        <section id="hero" className="pt-6 pb-10 sm:pt-12 sm:pb-16 relative">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
-            <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-950/40 text-cyan-300 font-mono text-xs tracking-wider shadow-sm">
-                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
-                SEC_ENG // CYBERSECURITY ENTHUSIAST &amp; CISCO CCNA CERTIFIED
-              </div>
-
-              <h1 className="font-heading font-extrabold text-4xl sm:text-5xl lg:text-6xl text-[var(--text-primary)] tracking-tight leading-[1.12]">
-                Engineering <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-sky-300 bg-clip-text text-transparent">Hardened Security</span> &amp; High-Availability Networks.
-              </h1>
-
-              <p className="font-sans text-lg text-slate-300 leading-relaxed max-w-2xl">
-                Hi, I'm <strong className="text-[var(--text-primary)] font-semibold">Darshan S</strong>. I am a cybersecurity enthusiast and CCNA-certified software engineer specializing in cryptographic data pipelines, defensive security architectures, and mission-critical enterprise network resilience.
-              </p>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-                <TiltCard maxTilt={10} className="glass-panel p-3.5 rounded-xl border border-slate-800 bg-[var(--card-bg)]/85">
-                  <div className="font-mono text-sm text-cyan-400 font-bold">&lt; 13.8ms</div>
-                  <div className="text-[11px] font-mono text-slate-400 mt-1">Inference Latency</div>
-                </TiltCard>
-                <TiltCard maxTilt={10} className="glass-panel p-3.5 rounded-xl border border-slate-800 bg-[var(--card-bg)]/85">
-                  <div className="font-mono text-sm text-blue-400 font-bold">98.4% mAP</div>
-                  <div className="text-[11px] font-mono text-slate-400 mt-1">Detection Precision</div>
-                </TiltCard>
-                <TiltCard maxTilt={10} className="glass-panel p-3.5 rounded-xl border border-slate-800 bg-[var(--card-bg)]/85">
-                  <div className="font-mono text-sm text-cyan-300 font-bold">CCNA Tier-3</div>
-                  <div className="text-[11px] font-mono text-slate-400 mt-1">Cisco Enterprise</div>
-                </TiltCard>
-                <TiltCard maxTilt={10} className="glass-panel p-3.5 rounded-xl border border-slate-800 bg-[var(--card-bg)]/85">
-                  <div className="font-mono text-sm text-emerald-400 font-bold">99.99%</div>
-                  <div className="text-[11px] font-mono text-slate-400 mt-1">Fault Resilience</div>
-                </TiltCard>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-4 pt-3">
-                <a 
-                  href="#workflow" 
-                  onClick={() => triggerSound(1100)}
-                  className="px-6 py-3.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-heading font-semibold text-sm transition-all shadow-xl shadow-blue-600/30 hover:shadow-cyan-400/40 border border-blue-400/40 flex items-center gap-2 cursor-pointer"
-                >
-                  <span>EXPLORE WORKFLOW PIPELINE</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                </a>
-                <a 
-                  href="#projects" 
-                  onClick={() => triggerSound(850)}
-                  className="px-5 py-3.5 rounded-lg glass-panel hover:bg-slate-800/80 text-cyan-400 font-mono text-xs transition-all border border-cyan-500/25 flex items-center gap-2 cursor-pointer"
-                >
-                  <span>&gt; CASE_STUDIES</span>
-                </a>
-                <a 
-                  href="#terminal-section" 
-                  onClick={() => triggerSound(950)}
-                  className="px-4 py-3.5 rounded-lg border border-slate-700/80 hover:border-slate-500 text-slate-400 hover:text-[var(--text-primary)] font-mono text-xs transition-all flex items-center gap-2 cursor-pointer"
-                >
-                  <span>[&gt;_ OPEN CLI]</span>
-                </a>
-              </div>
+        {/* Hero Section - Focused Only on Text */}
+        <AnimatedContent distance={60} direction="vertical" duration={0.85} ease="power3.out">
+          <section id="hero" className="pt-24 pb-6 sm:pt-28 sm:pb-10 relative max-w-4xl mx-auto text-center space-y-6">
+            <div className="flex justify-center">
+              <GlassSurface
+                width="auto"
+                height="auto"
+                borderRadius={999}
+                distortionScale={-140}
+                displace={0.4}
+                backgroundOpacity={0.14}
+                className="border border-zinc-800/90 shadow-lg inline-flex"
+              >
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 text-zinc-300 font-mono text-xs tracking-wider">
+                  <span className="w-2 h-2 rounded-full bg-white animate-ping"></span>
+                  SEC_ENG // CYBERSECURITY ENTHUSIAST &amp; CISCO CCNA CERTIFIED
+                </div>
+              </GlassSurface>
             </div>
 
-            {/* Profile Photo Card */}
-            <div className="lg:col-span-5 flex justify-center">
-              <TiltCard maxTilt={12} className="w-full max-w-md">
-                <div className="relative glass-panel rounded-2xl border border-cyan-500/30 bg-[var(--card-bg)]/90 p-5 shadow-2xl shadow-cyan-950/60 overflow-hidden animate-border-glow">
-                  <div className="corner-bracket-tl"></div>
-                  <div className="corner-bracket-tr"></div>
-                  <div className="corner-bracket-bl"></div>
-                  <div className="corner-bracket-br"></div>
+            <h1 className="font-heading font-extrabold text-4xl sm:text-5xl lg:text-6xl text-[var(--text-primary)] tracking-tight leading-[1.15]">
+              Engineering{' '}
+              <GradientText
+                colors={["#7cff67", "#B497CF", "#5227FF"]}
+                animationSpeed={6}
+                variant="flow"
+                glow={0.4}
+              >
+                Hardened Security
+              </GradientText>{' '}
+              &amp; High-Availability Networks.
+            </h1>
 
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-800 text-xs font-mono">
-                    <span className="flex items-center gap-2 text-cyan-400 font-semibold">
-                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                      BIOMETRIC_PROFILE: #0xDS
-                    </span>
-                    <span className="text-slate-500">CLEARANCE: LEVEL_0</span>
-                  </div>
+            <p className="font-sans text-lg text-zinc-300 leading-relaxed max-w-2xl mx-auto">
+              Hi, I'm <strong className="text-[var(--text-primary)] font-semibold">Darshan S</strong>. I am a cybersecurity enthusiast and CCNA-certified software engineer specializing in cryptographic data pipelines, defensive security architectures, and mission-critical enterprise network resilience.
+            </p>
 
-                  <div className="relative mt-4 rounded-xl overflow-hidden border border-cyan-500/30 bg-[#040813] photo-shimmer group">
-                    <img 
-                      src="/profile.jpg" 
-                      alt="Darshan S - Software Developer & Cybersecurity Enthusiast" 
-                      className={`w-full h-84 object-cover object-top transition-all duration-700 ${hologramMode ? 'filter hue-rotate-180 contrast-125' : 'group-hover:scale-105'}`}
-                    />
-
-                    <div className="absolute inset-0 bg-radar-scan pointer-events-none opacity-30"></div>
-                    <div className="absolute inset-0 scanlines-overlay"></div>
-
-                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between bg-[var(--surface)]/90 backdrop-blur-md border border-cyan-500/30 px-3 py-2 rounded-lg text-xs font-mono">
-                      <div>
-                        <div className="text-[var(--text-primary)] font-bold flex items-center gap-1.5">
-                          DARSHAN S
-                          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
-                        </div>
-                        <div className="text-[10px] text-slate-400">CYBERSECURITY ENTHUSIAST</div>
-                      </div>
-                      <span className="text-[10px] text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded font-semibold">
-                        AVAILABLE
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-mono text-slate-400">
-                    <span>CERTIFIED: CISCO CCNA</span>
-                    <button 
-                      onClick={() => { setHologramMode(!hologramMode); triggerSound(1300); }}
-                      className="text-cyan-400 hover:text-cyan-300 cursor-pointer transition-colors"
-                    >
-                      [ {hologramMode ? 'NORMAL VIEW' : 'HOLOGRAPHIC HUD'} ]
-                    </button>
-                  </div>
-                </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 max-w-3xl mx-auto">
+              <TiltCard maxTilt={8} className="glass-panel p-3.5 rounded-xl border border-zinc-800 bg-[var(--card-bg)]/85">
+                <div className="font-mono text-sm text-white font-bold">&lt; 13.8ms</div>
+                <div className="text-[11px] font-mono text-zinc-400 mt-1">Inference Latency</div>
+              </TiltCard>
+              <TiltCard maxTilt={8} className="glass-panel p-3.5 rounded-xl border border-zinc-800 bg-[var(--card-bg)]/85">
+                <div className="font-mono text-sm text-white font-bold">98.4% mAP</div>
+                <div className="text-[11px] font-mono text-zinc-400 mt-1">Detection Precision</div>
+              </TiltCard>
+              <TiltCard maxTilt={8} className="glass-panel p-3.5 rounded-xl border border-zinc-800 bg-[var(--card-bg)]/85">
+                <div className="font-mono text-sm text-white font-bold">CCNA Tier-3</div>
+                <div className="text-[11px] font-mono text-zinc-400 mt-1">Cisco Enterprise</div>
+              </TiltCard>
+              <TiltCard maxTilt={8} className="glass-panel p-3.5 rounded-xl border border-zinc-800 bg-[var(--card-bg)]/85">
+                <div className="font-mono text-sm text-white font-bold">99.99%</div>
+                <div className="text-[11px] font-mono text-zinc-400 mt-1">Fault Resilience</div>
               </TiltCard>
             </div>
 
-          </div>
-        </section>
+            <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
+              <a 
+                href="#workflow" 
+                onClick={() => triggerSound(1100)}
+                className="px-6 py-3.5 rounded-full bg-white hover:bg-zinc-200 text-black font-heading font-semibold text-sm transition-all shadow-xl shadow-white/10 hover:shadow-white/20 border border-white flex items-center gap-2 cursor-pointer"
+              >
+                <span>EXPLORE WORKFLOW PIPELINE</span>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </a>
+              <a 
+                href="#projects" 
+                onClick={() => triggerSound(850)}
+                className="px-5 py-3.5 rounded-full glass-panel hover:bg-zinc-800 text-white font-mono text-xs transition-all border border-zinc-700 flex items-center gap-2 cursor-pointer"
+              >
+                <span>&gt; CASE_STUDIES</span>
+              </a>
+              <a 
+                href="#terminal-section" 
+                onClick={() => triggerSound(950)}
+                className="px-4 py-3.5 rounded-full border border-zinc-700 hover:border-white text-zinc-400 hover:text-white font-mono text-xs transition-all flex items-center gap-2 cursor-pointer"
+              >
+                <span>[&gt;_ OPEN CLI]</span>
+              </a>
+            </div>
+          </section>
+        </AnimatedContent>
+
+        {/* Profile Photo Presentation Card (Moved Down) */}
+        <AnimatedContent distance={70} direction="vertical" duration={0.9} delay={0.1} threshold={0.15}>
+          <section id="profile-presentation" className="flex justify-center -mt-6 sm:-mt-10 scroll-mt-28">
+            <TiltCard maxTilt={8} className="w-full max-w-lg">
+              <div className="relative glass-panel rounded-2xl border border-zinc-700 bg-[var(--card-bg)]/90 p-5 shadow-2xl shadow-black/80 overflow-hidden">
+                <div className="flex items-center justify-between pb-3 border-b border-zinc-800 text-xs font-mono">
+                  <span className="flex items-center gap-2 text-white font-semibold">
+                    <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                    BIOMETRIC_PROFILE: #0xDS
+                  </span>
+                  <span className="text-zinc-500">CLEARANCE: LEVEL_0</span>
+                </div>
+
+                <div className="relative mt-4 rounded-xl overflow-hidden border border-zinc-700 bg-black group">
+                  <img 
+                    ref={profilePhotoRef}
+                    src="/profile.jpg" 
+                    alt="Darshan S - Software Developer & Cybersecurity Enthusiast" 
+                    className="w-full h-96 object-cover object-top transition-all duration-700 group-hover:scale-105"
+                  />
+
+                  <div className="absolute bottom-3 left-3 right-3">
+                    <GlassSurface
+                      backdrop={profilePhotoRef}
+                      width="100%"
+                      height="auto"
+                      borderRadius={10}
+                      distortionScale={-160}
+                      displace={0.35}
+                      backgroundOpacity={0.18}
+                      className="border border-zinc-700/90 shadow-xl"
+                    >
+                      <div className="w-full flex items-center justify-between px-3 py-2 text-xs font-mono">
+                        <div>
+                          <div className="text-[var(--text-primary)] font-bold flex items-center gap-1.5">
+                            DARSHAN S
+                            <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
+                          </div>
+                          <div className="text-[10px] text-zinc-400">CYBERSECURITY ENTHUSIAST &amp; CISCO CCNA</div>
+                        </div>
+                        <span className="text-[10px] text-white bg-zinc-900/90 border border-zinc-700 px-2 py-0.5 rounded font-semibold">
+                          AVAILABLE
+                        </span>
+                      </div>
+                    </GlassSurface>
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-zinc-800/80 flex items-center justify-between text-[11px] font-mono text-zinc-400">
+                  <span>CERTIFIED: CISCO CCNA (ACTIVE &amp; VERIFIED)</span>
+                  <span className="text-white font-mono">#CCNA-0x9B41</span>
+                </div>
+              </div>
+            </TiltCard>
+          </section>
+        </AnimatedContent>
 
         {/* SECTION 01: OVERVIEW */}
-        <section id="overview" className="space-y-8 scroll-mt-24">
-          <div className="flex items-center gap-3">
-            <span className="font-mono text-xs text-cyan-400 font-semibold">01. // CORE COMPETENCIES</span>
-            <div className="h-px bg-slate-800 flex-1"></div>
-          </div>
+        <AnimatedContent distance={80} direction="vertical" duration={0.85} threshold={0.15}>
+          <section id="overview" className="space-y-8 scroll-mt-24">
+            <div className="flex items-center gap-3">
+              <span className="font-mono text-xs text-zinc-300 font-semibold">01. // CORE COMPETENCIES</span>
+              <div className="h-px bg-zinc-800 flex-1"></div>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <TiltCard maxTilt={8} className="glass-panel rounded-xl p-6 border border-slate-800 bg-[var(--card-bg)]/80 hover:border-cyan-500/40 transition-all group">
-              <div className="w-12 h-12 rounded-lg bg-cyan-950/80 border border-cyan-500/30 flex items-center justify-center text-cyan-300 mb-5 group-hover:scale-110 transition-transform">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-              </div>
-              <h3 className="font-heading font-bold text-lg text-[var(--text-primary)] mb-2">Applied Cryptography &amp; Security</h3>
-              <p className="text-slate-300 text-sm leading-relaxed">
-                Constructing high-entropy encryption mechanisms, bitwise pixel permutation matrix algorithms, zero-loss restoration, and automated payload sanitization.
-              </p>
-              <div className="mt-4 flex flex-wrap gap-1.5 font-mono text-[11px]">
-                <span className="badge">AES-256</span>
-                <span className="badge">Matrix Cipher</span>
-                <span className="badge">Entropy &gt;7.99</span>
-                <span className="badge">SHA-512</span>
-              </div>
-            </TiltCard>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <TiltCard maxTilt={8} className="glass-panel rounded-xl p-6 border border-zinc-800 bg-[var(--card-bg)]/80 hover:border-zinc-600 transition-all group">
+                <div className="w-12 h-12 rounded-lg bg-zinc-900 border border-zinc-700 flex items-center justify-center text-white mb-5 group-hover:scale-110 transition-transform">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                </div>
+                <h3 className="font-heading font-bold text-lg text-[var(--text-primary)] mb-2">Applied Cryptography &amp; Security</h3>
+                <p className="text-zinc-300 text-sm leading-relaxed">
+                  Constructing high-entropy encryption mechanisms, bitwise pixel permutation matrix algorithms, zero-loss restoration, and automated payload sanitization.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-1.5 font-mono text-[11px]">
+                  <span className="badge">AES-256</span>
+                  <span className="badge">Matrix Cipher</span>
+                  <span className="badge">Entropy &gt;7.99</span>
+                  <span className="badge">SHA-512</span>
+                </div>
+              </TiltCard>
 
-            <TiltCard maxTilt={8} className="glass-panel rounded-xl p-6 border border-slate-800 bg-[var(--card-bg)]/80 hover:border-cyan-500/40 transition-all group">
-              <div className="w-12 h-12 rounded-lg bg-blue-950/80 border border-blue-500/30 flex items-center justify-center text-blue-400 mb-5 group-hover:scale-110 transition-transform">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-              </div>
-              <h3 className="font-heading font-bold text-lg text-[var(--text-primary)] mb-2">Enterprise Networking (CCNA)</h3>
-              <p className="text-slate-300 text-sm leading-relaxed">
-                Certified expertise in Cisco routing architectures, OSPF/BGP routing protocols, VLAN trunking, NAT configurations, packet capture diagnostics, and multi-tier network topologies.
-              </p>
-              <div className="mt-4 flex flex-wrap gap-1.5 font-mono text-[11px]">
-                <span className="badge">Cisco CCNA</span>
-                <span className="badge">OSPF / BGP</span>
-                <span className="badge">Wireshark</span>
-                <span className="badge">VLAN / Trunking</span>
-              </div>
-            </TiltCard>
+              <TiltCard maxTilt={8} className="glass-panel rounded-xl p-6 border border-zinc-800 bg-[var(--card-bg)]/80 hover:border-zinc-600 transition-all group">
+                <div className="w-12 h-12 rounded-lg bg-zinc-900 border border-zinc-700 flex items-center justify-center text-white mb-5 group-hover:scale-110 transition-transform">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+                <h3 className="font-heading font-bold text-lg text-[var(--text-primary)] mb-2">Enterprise Networking (CCNA)</h3>
+                <p className="text-zinc-300 text-sm leading-relaxed">
+                  Certified expertise in Cisco routing architectures, OSPF/BGP routing protocols, VLAN trunking, NAT configurations, packet capture diagnostics, and multi-tier network topologies.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-1.5 font-mono text-[11px]">
+                  <span className="badge">Cisco CCNA</span>
+                  <span className="badge">OSPF / BGP</span>
+                  <span className="badge">Wireshark</span>
+                  <span className="badge">VLAN / Trunking</span>
+                </div>
+              </TiltCard>
 
-            <TiltCard maxTilt={8} className="glass-panel rounded-xl p-6 border border-slate-800 bg-[var(--card-bg)]/80 hover:border-cyan-500/40 transition-all group">
-              <div className="w-12 h-12 rounded-lg bg-blue-950/80 border border-blue-500/30 flex items-center justify-center text-cyan-400 mb-5 group-hover:scale-110 transition-transform">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-              </div>
-              <h3 className="font-heading font-bold text-lg text-[var(--text-primary)] mb-2">Computer Vision &amp; Deep Learning</h3>
-              <p className="text-slate-300 text-sm leading-relaxed">
-                Developing real-time semantic segmentation, micro-particle classification, feature extraction, and edge inference deployment pipelines with PyTorch, CUDA, and TensorRT.
-              </p>
-              <div className="mt-4 flex flex-wrap gap-1.5 font-mono text-[11px]">
-                <span className="badge">PyTorch</span>
-                <span className="badge">OpenCV</span>
-                <span className="badge">YOLOv8</span>
-                <span className="badge">TensorRT</span>
-              </div>
-            </TiltCard>
-          </div>
-        </section>
+              <TiltCard maxTilt={8} className="glass-panel rounded-xl p-6 border border-zinc-800 bg-[var(--card-bg)]/80 hover:border-zinc-600 transition-all group">
+                <div className="w-12 h-12 rounded-lg bg-zinc-900 border border-zinc-700 flex items-center justify-center text-white mb-5 group-hover:scale-110 transition-transform">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                </div>
+                <h3 className="font-heading font-bold text-lg text-[var(--text-primary)] mb-2">Computer Vision &amp; Deep Learning</h3>
+                <p className="text-zinc-300 text-sm leading-relaxed">
+                  Developing real-time semantic segmentation, micro-particle classification, feature extraction, and edge inference deployment pipelines with PyTorch, CUDA, and TensorRT.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-1.5 font-mono text-[11px]">
+                  <span className="badge">PyTorch</span>
+                  <span className="badge">OpenCV</span>
+                  <span className="badge">YOLOv8</span>
+                  <span className="badge">TensorRT</span>
+                </div>
+              </TiltCard>
+            </div>
+          </section>
+        </AnimatedContent>
 
         {/* NEW SECTION: WORKFLOW PIPELINE COMPONENT */}
-        <WorkflowSection triggerSound={triggerSound} />
+        <AnimatedContent distance={80} direction="vertical" duration={0.85} threshold={0.15}>
+          <WorkflowSection triggerSound={triggerSound} />
+        </AnimatedContent>
 
         {/* SECTION 03: FEATURED PROJECTS */}
-        <section id="projects" className="space-y-10 scroll-mt-24">
+        <AnimatedContent distance={80} direction="vertical" duration={0.85} threshold={0.15}>
+          <section id="projects" className="space-y-10 scroll-mt-24">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-1">
-              <span className="font-mono text-xs text-cyan-400 font-semibold">03. // MISSION-CRITICAL ARTIFACTS</span>
+              <span className="font-mono text-xs text-zinc-300 font-semibold">03. // MISSION-CRITICAL ARTIFACTS</span>
               <h2 className="font-heading font-extrabold text-3xl sm:text-4xl text-[var(--text-primary)] tracking-tight">Featured Engineering Projects</h2>
             </div>
 
-            <div className="flex items-center gap-1.5 p-1 rounded-lg bg-[var(--surface-low)] border border-slate-800 font-mono text-xs overflow-x-auto">
+            <div className="flex items-center gap-1.5 p-1 rounded-lg bg-[var(--surface-low)] border border-zinc-800 font-mono text-xs overflow-x-auto">
               {['ALL', 'SECURITY', 'NETWORKING', 'AI_CV'].map(cat => (
                 <button 
                   key={cat}
                   onClick={() => { setActiveCategory(cat); triggerSound(800); }}
-                  className={`px-3 py-1.5 rounded-md transition-all cursor-pointer ${activeCategory === cat ? 'bg-blue-600 text-white font-semibold' : 'text-slate-400 hover:text-[var(--text-primary)]'}`}
+                  className={`px-3 py-1.5 rounded-md transition-all cursor-pointer ${activeCategory === cat ? 'bg-white text-black font-semibold' : 'text-zinc-400 hover:text-[var(--text-primary)]'}`}
                 >
                   {cat === 'AI_CV' ? 'AI / CV' : cat}
                 </button>
@@ -761,28 +755,28 @@ Status  : Open for Engineering Roles & Cybersecurity Inquiries`
           <div className="space-y-8">
             {filteredProjects.map((proj) => (
               <TiltCard key={proj.id} maxTilt={6}>
-                <article className="glass-panel rounded-2xl border border-slate-800 bg-[var(--card-bg)]/85 overflow-hidden hover:border-cyan-500/40 transition-all duration-300">
+                <article className="glass-panel rounded-2xl border border-zinc-800 bg-[var(--card-bg)]/85 overflow-hidden hover:border-zinc-600 transition-all duration-300">
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
                     <div className="lg:col-span-7 p-6 sm:p-8 flex flex-col justify-between space-y-6">
                       <div className="space-y-3">
-                        <div className="flex items-center gap-2 font-mono text-xs text-cyan-400 font-semibold">
-                          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                        <div className="flex items-center gap-2 font-mono text-xs text-zinc-300 font-semibold">
+                          <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
                           {proj.tagline}
                         </div>
                         <h3 className="font-heading font-bold text-2xl text-[var(--text-primary)]">{proj.title}</h3>
-                        <p className="text-slate-300 text-sm leading-relaxed">{proj.description}</p>
+                        <p className="text-zinc-300 text-sm leading-relaxed">{proj.description}</p>
                       </div>
 
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 font-mono text-xs">
                         {proj.metrics.map((m, idx) => (
-                          <div key={idx} className="bg-[var(--surface-low)] p-3 rounded-lg border border-slate-800">
-                            <span className="text-slate-500 block text-[10px]">{m.label}</span>
-                            <span className="text-cyan-400 font-semibold">{m.value}</span>
+                          <div key={idx} className="bg-[var(--surface-low)] p-3 rounded-lg border border-zinc-800">
+                            <span className="text-zinc-500 block text-[10px]">{m.label}</span>
+                            <span className="text-white font-semibold">{m.value}</span>
                           </div>
                         ))}
                       </div>
 
-                      <div className="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-slate-800/80">
+                      <div className="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-zinc-800/80">
                         <div className="flex flex-wrap gap-1.5 font-mono text-xs">
                           {proj.tags.map((t, idx) => (
                             <span key={idx} className="badge">{t}</span>
@@ -793,14 +787,14 @@ Status  : Open for Engineering Roles & Cybersecurity Inquiries`
                           <button 
                             onClick={() => handleRunSimulation(proj)}
                             disabled={simulatingProject === proj.id}
-                            className="px-3.5 py-1.5 rounded-md bg-cyan-950/70 border border-cyan-500/40 hover:bg-cyan-900/50 text-cyan-300 font-semibold transition-all cursor-pointer flex items-center gap-1.5"
+                            className="px-3.5 py-1.5 rounded-md bg-zinc-900 border border-zinc-700 hover:border-white text-white font-semibold transition-all cursor-pointer flex items-center gap-1.5 hover:bg-zinc-800"
                           >
                             {simulatingProject === proj.id ? <span>[ SCANNING... ]</span> : <span>[ RUN SIMULATION ]</span>}
                           </button>
 
                           <button 
                             onClick={() => { setSelectedModalProject(proj); triggerSound(900); }}
-                            className="px-3 py-1.5 rounded-md border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-[var(--text-primary)] transition-all cursor-pointer"
+                            className="px-3 py-1.5 rounded-md border border-zinc-700 hover:border-zinc-500 text-zinc-300 hover:text-[var(--text-primary)] transition-all cursor-pointer"
                           >
                             [ ARCHITECTURE ]
                           </button>
@@ -808,65 +802,65 @@ Status  : Open for Engineering Roles & Cybersecurity Inquiries`
                       </div>
 
                       {simResult[proj.id] && (
-                        <div className="bg-emerald-950/40 border border-emerald-500/40 p-3 rounded-lg font-mono text-xs text-emerald-300 animate-fadeIn">
+                        <div className="bg-zinc-900 border border-zinc-700 p-3 rounded-lg font-mono text-xs text-zinc-200 animate-fadeIn">
                           &gt; {simResult[proj.id]}
                         </div>
                       )}
                     </div>
 
-                    <div className="lg:col-span-5 bg-[#050914] border-t lg:border-t-0 lg:border-l border-slate-800 p-6 flex flex-col justify-center relative overflow-hidden">
-                      <div className="w-full aspect-[4/3] rounded-xl border border-cyan-500/25 bg-slate-950 p-4 relative flex flex-col justify-between">
-                        <div className="flex justify-between items-center text-[10px] font-mono text-slate-400">
-                          <span className="text-cyan-400 font-semibold">STATUS: ACTIVE_FEED</span>
+                    <div className="lg:col-span-5 bg-black border-t lg:border-t-0 lg:border-l border-zinc-800 p-6 flex flex-col justify-center relative overflow-hidden">
+                      <div className="w-full aspect-[4/3] rounded-xl border border-zinc-700 bg-black p-4 relative flex flex-col justify-between">
+                        <div className="flex justify-between items-center text-[10px] font-mono text-zinc-400">
+                          <span className="text-white font-semibold">STATUS: ACTIVE_FEED</span>
                           <span>TELEMETRY: VERIFIED</span>
                         </div>
 
-                        <div className="relative flex-1 my-3 rounded bg-[#070e1c] border border-slate-800 p-3 font-mono flex flex-col justify-center items-center overflow-hidden">
-                          <div className="absolute inset-0 bg-cyber-grid opacity-20 pointer-events-none"></div>
+                        <div className="relative flex-1 my-3 rounded bg-[#09090b] border border-zinc-800 p-3 font-mono flex flex-col justify-center items-center overflow-hidden">
+                          <div className="absolute inset-0 bg-cyber-grid opacity-15 pointer-events-none"></div>
 
                           {proj.category === 'SECURITY' && (
-                            <div className="w-full h-full flex flex-col justify-center font-mono text-[10px] text-cyan-400/80 space-y-1">
-                              <div className="opacity-40">01000001 01000101 01010011 00101101</div>
-                              <div className="text-cyan-300 font-bold">&gt; ENTROPY: 7.9998 bits/byte [MAX]</div>
-                              <div className="text-blue-400">&gt; SEED: 0x8F3A29B1E40C77D2</div>
-                              <div className="opacity-40">11010110 00101001 10101111 01010010</div>
+                            <div className="w-full h-full flex flex-col justify-center font-mono text-[10px] text-zinc-300 space-y-1">
+                              <div className="opacity-30">01000001 01000101 01010011 00101101</div>
+                              <div className="text-white font-bold">&gt; ENTROPY: 7.9998 bits/byte [MAX]</div>
+                              <div className="text-zinc-400">&gt; SEED: 0x8F3A29B1E40C77D2</div>
+                              <div className="opacity-30">11010110 00101001 10101111 01010010</div>
                             </div>
                           )}
 
                           {proj.category === 'NETWORKING' && (
-                            <div className="w-full h-full flex flex-col justify-between font-mono text-[10px] text-slate-300">
-                              <div className="text-center bg-blue-900/60 border border-blue-500/80 px-2 py-0.5 rounded text-white w-fit mx-auto">
+                            <div className="w-full h-full flex flex-col justify-between font-mono text-[10px] text-zinc-300">
+                              <div className="text-center bg-zinc-800 border border-zinc-600 px-2 py-0.5 rounded text-white w-fit mx-auto">
                                 [ CORE_ROUTER_01 ] 10.0.0.1
                               </div>
-                              <div className="flex justify-around text-cyan-400 text-[9px]">
+                              <div className="flex justify-around text-zinc-400 text-[9px]">
                                 <span>↓ OSPF-AREA 0</span>
                                 <span>↓ OSPF-AREA 0</span>
                               </div>
                               <div className="flex justify-between text-[9px]">
-                                <span className="bg-slate-800 px-1.5 py-0.5 rounded">DIST_SW_A (VLAN 10)</span>
-                                <span className="bg-slate-800 px-1.5 py-0.5 rounded">DIST_SW_B (VLAN 20)</span>
+                                <span className="bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-300">DIST_SW_A (VLAN 10)</span>
+                                <span className="bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-300">DIST_SW_B (VLAN 20)</span>
                               </div>
                             </div>
                           )}
 
                           {proj.category === 'AI_CV' && (
                             <div className="w-full h-full flex flex-col justify-between relative z-10 text-[10px]">
-                              <div className="border border-cyan-400/80 bg-cyan-950/40 px-2 py-1 rounded text-cyan-300 w-fit">
+                              <div className="border border-zinc-600 bg-zinc-900 px-2 py-1 rounded text-white w-fit">
                                 POLYETHYLENE (PE) [99.2%]
                               </div>
-                              <div className="text-center text-cyan-300 font-bold text-sm">
+                              <div className="text-center text-white font-bold text-sm">
                                 <span className="animate-pulse">2,410</span> PARTICLES QUANTIFIED
                               </div>
-                              <div className="border border-blue-400/80 bg-blue-950/40 px-2 py-1 rounded text-blue-300 w-fit self-end">
+                              <div className="border border-zinc-600 bg-zinc-900 px-2 py-1 rounded text-zinc-300 w-fit self-end">
                                 POLYPROPYLENE (PP) [96.8%]
                               </div>
                             </div>
                           )}
                         </div>
 
-                        <div className="flex justify-between text-[10px] font-mono text-slate-500">
+                        <div className="flex justify-between text-[10px] font-mono text-zinc-500">
                           <span>PARITY: 100% OK</span>
-                          <span className="text-emerald-400">PASSED: READY</span>
+                          <span className="text-white font-semibold">PASSED: READY</span>
                         </div>
                       </div>
                     </div>
@@ -876,18 +870,19 @@ Status  : Open for Engineering Roles & Cybersecurity Inquiries`
             ))}
           </div>
         </section>
+        </AnimatedContent>
 
         {/* Modal Drawer */}
         {selectedModalProject && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
-            <div className="relative w-full max-w-2xl glass-panel rounded-2xl border border-cyan-500/40 bg-[var(--surface)] p-6 space-y-4">
-              <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+            <div className="relative w-full max-w-2xl glass-panel rounded-2xl border border-zinc-700 bg-[var(--surface)] p-6 space-y-4">
+              <div className="flex justify-between items-center border-b border-zinc-800 pb-3">
                 <h3 className="font-heading font-bold text-lg text-[var(--text-primary)]">
                   [SPEC_VIEW] // {selectedModalProject.title}
                 </h3>
                 <button 
                   onClick={() => setSelectedModalProject(null)}
-                  className="text-slate-400 hover:text-[var(--text-primary)] font-mono text-sm px-2 py-1 rounded"
+                  className="text-zinc-400 hover:text-[var(--text-primary)] font-mono text-sm px-2 py-1 rounded"
                 >
                   [CLOSE ✕]
                 </button>
@@ -895,15 +890,15 @@ Status  : Open for Engineering Roles & Cybersecurity Inquiries`
 
               <div className="space-y-3 font-mono text-xs">
                 <div>
-                  <span className="text-cyan-400 font-semibold block mb-1">PIPELINE ARCHITECTURE:</span>
-                  <div className="bg-[var(--surface-low)] p-3 rounded-lg border border-slate-800 text-[var(--text-primary)]">
+                  <span className="text-zinc-300 font-semibold block mb-1">PIPELINE ARCHITECTURE:</span>
+                  <div className="bg-[var(--surface-low)] p-3 rounded-lg border border-zinc-800 text-[var(--text-primary)]">
                     {selectedModalProject.architecture}
                   </div>
                 </div>
 
                 <div>
-                  <span className="text-cyan-400 font-semibold block mb-1">SPECIFICATION DETAILS:</span>
-                  <p className="text-slate-300 font-sans text-sm leading-relaxed">
+                  <span className="text-zinc-300 font-semibold block mb-1">SPECIFICATION DETAILS:</span>
+                  <p className="text-zinc-300 font-sans text-sm leading-relaxed">
                     {selectedModalProject.description}
                   </p>
                 </div>
@@ -911,7 +906,7 @@ Status  : Open for Engineering Roles & Cybersecurity Inquiries`
                 <div className="pt-2 flex justify-end">
                   <button 
                     onClick={() => setSelectedModalProject(null)}
-                    className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-heading font-semibold text-xs"
+                    className="px-4 py-2 rounded-lg bg-white hover:bg-zinc-200 text-black font-heading font-semibold text-xs"
                   >
                     DISMISS DRAWER
                   </button>
@@ -922,10 +917,11 @@ Status  : Open for Engineering Roles & Cybersecurity Inquiries`
         )}
 
         {/* SECTION 04: SKILLS */}
-        <section id="skills" className="space-y-8 scroll-mt-24">
+        <AnimatedContent distance={80} direction="vertical" duration={0.85} threshold={0.15}>
+          <section id="skills" className="space-y-8 scroll-mt-24">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-1">
-              <span className="font-mono text-xs text-cyan-400 font-semibold">04. // TECHNICAL CAPABILITIES</span>
+              <span className="font-mono text-xs text-white font-semibold">04. // TECHNICAL CAPABILITIES</span>
               <h2 className="font-heading font-extrabold text-3xl text-[var(--text-primary)]">Skills Matrix &amp; Technologies</h2>
             </div>
 
@@ -935,10 +931,10 @@ Status  : Open for Engineering Roles & Cybersecurity Inquiries`
                 value={searchSkill}
                 onChange={(e) => setSearchSkill(e.target.value)}
                 placeholder="Search skills (e.g. AES, CCNA)..."
-                className="w-full bg-[var(--surface-low)] border border-slate-700/80 rounded-lg px-3.5 py-2 text-xs font-mono text-[var(--text-primary)] placeholder-slate-500 focus:border-cyan-400 focus:outline-none transition-colors"
+                className="w-full bg-[var(--surface-low)] border border-zinc-700/80 rounded-lg px-3.5 py-2 text-xs font-mono text-[var(--text-primary)] placeholder-zinc-500 focus:border-white focus:outline-none transition-colors"
               />
               {searchSkill && (
-                <button onClick={() => setSearchSkill('')} className="absolute right-2.5 top-2 text-slate-500 hover:text-[var(--text-primary)] text-xs">✕</button>
+                <button onClick={() => setSearchSkill('')} className="absolute right-2.5 top-2 text-zinc-500 hover:text-[var(--text-primary)] text-xs">✕</button>
               )}
             </div>
           </div>
@@ -948,7 +944,7 @@ Status  : Open for Engineering Roles & Cybersecurity Inquiries`
               <button 
                 key={cat}
                 onClick={() => { setSelectedSkillCategory(cat); triggerSound(800); }}
-                className={`px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${selectedSkillCategory === cat ? 'bg-cyan-950 border-cyan-400 text-cyan-300 font-semibold shadow-sm' : 'border-slate-800 bg-[var(--surface-low)] text-slate-400 hover:border-slate-600 hover:text-[var(--text-primary)]'}`}
+                className={`px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${selectedSkillCategory === cat ? 'bg-white text-black font-semibold border-white shadow-sm' : 'border-zinc-800 bg-[var(--surface-low)] text-zinc-400 hover:border-zinc-600 hover:text-[var(--text-primary)]'}`}
               >
                 {cat}
               </button>
@@ -957,229 +953,234 @@ Status  : Open for Engineering Roles & Cybersecurity Inquiries`
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredSkills.map((s, idx) => (
-              <TiltCard key={idx} maxTilt={6} className="glass-panel rounded-xl p-4 border border-slate-800 bg-[var(--card-bg)]/80 hover:border-cyan-500/40 transition-all space-y-2">
+              <TiltCard key={idx} maxTilt={6} className="glass-panel rounded-xl p-4 border border-zinc-800 bg-[var(--card-bg)]/80 hover:border-white/50 transition-all space-y-2">
                 <div className="flex justify-between items-center text-xs font-mono">
                   <span className="text-[var(--text-primary)] font-bold">{s.name}</span>
-                  <span className="text-cyan-400 font-semibold">{s.level}%</span>
+                  <span className="text-white font-semibold">{s.level}%</span>
                 </div>
 
-                <div className="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden">
+                <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
                   <div 
-                    className="bg-gradient-to-r from-blue-500 to-cyan-400 h-full rounded-full transition-all duration-500"
+                    className="bg-gradient-to-r from-zinc-500 to-white h-full rounded-full transition-all duration-500"
                     style={{ width: `${s.level}%` }}
                   ></div>
                 </div>
 
-                <p className="text-[11px] text-slate-400 leading-normal">{s.desc}</p>
+                <p className="text-[11px] text-zinc-400 leading-normal">{s.desc}</p>
               </TiltCard>
             ))}
           </div>
         </section>
+        </AnimatedContent>
 
         {/* SECTION 05: CREDENTIALS */}
-        <section id="credentials" className="space-y-8 scroll-mt-24">
+        <AnimatedContent distance={80} direction="vertical" duration={0.85} threshold={0.15}>
+          <section id="credentials" className="space-y-8 scroll-mt-24">
           <div className="flex items-center gap-3">
-            <span className="font-mono text-xs text-cyan-400 font-semibold">05. // VERIFIED CREDENTIALS</span>
-            <div className="h-px bg-slate-800 flex-1"></div>
+            <span className="font-mono text-xs text-white font-semibold">05. // VERIFIED CREDENTIALS</span>
+            <div className="h-px bg-zinc-800 flex-1"></div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <TiltCard maxTilt={8} className="glass-panel rounded-xl p-6 border border-cyan-500/35 bg-[var(--card-bg)]/85 flex gap-5 items-start">
-              <div className="w-14 h-14 rounded-xl bg-blue-950/80 border border-blue-500/40 flex items-center justify-center font-mono font-bold text-cyan-300 text-sm flex-shrink-0 shadow-lg">
+            <TiltCard maxTilt={8} className="glass-panel rounded-xl p-6 border border-zinc-700 bg-[var(--card-bg)]/85 flex gap-5 items-start">
+              <div className="w-14 h-14 rounded-xl bg-zinc-900 border border-zinc-600 flex items-center justify-center font-mono font-bold text-white text-sm flex-shrink-0 shadow-lg">
                 CCNA
               </div>
               <div className="space-y-2">
-                <div className="flex items-center gap-2 font-mono text-[11px] text-cyan-400 font-semibold">
-                  <span>CISCO SYSTEMS</span>
-                  <span className="text-slate-600">•</span>
-                  <span className="text-emerald-400 font-semibold">OFFICIALLY CERTIFIED</span>
+                <div className="flex items-center gap-2 font-mono text-[11px] text-zinc-300 font-semibold">
+                  <span className="text-white">CISCO SYSTEMS</span>
+                  <span className="text-zinc-600">•</span>
+                  <span className="text-zinc-200 border border-zinc-700 px-1.5 py-0.5 rounded text-[10px]">OFFICIALLY CERTIFIED</span>
                 </div>
                 <h3 className="font-heading font-bold text-lg text-[var(--text-primary)]">Cisco Certified Network Associate (CCNA)</h3>
-                <p className="text-slate-300 text-xs leading-relaxed">
+                <p className="text-zinc-300 text-xs leading-relaxed">
                   Demonstrated mastery across enterprise IP services, network security fundamentals, subnet architecture, VLAN configuration, dynamic routing protocols (OSPF, BGP), and network programmability.
                 </p>
-                <div className="font-mono text-[11px] text-slate-500 pt-1 flex items-center gap-2">
+                <div className="font-mono text-[11px] text-zinc-500 pt-1 flex items-center gap-2">
                   <span>STATUS: ACTIVE &amp; VERIFIED</span>
-                  <span className="text-slate-600">|</span>
-                  <span className="text-cyan-400">HASH: #CCNA-0x9B41</span>
+                  <span className="text-zinc-600">|</span>
+                  <span className="text-white font-semibold">HASH: #CCNA-0x9B41</span>
                 </div>
               </div>
             </TiltCard>
 
-            <TiltCard maxTilt={8} className="glass-panel rounded-xl p-6 border border-slate-800 bg-[var(--card-bg)]/85 flex gap-5 items-start">
-              <div className="w-14 h-14 rounded-xl bg-cyan-950/80 border border-cyan-500/40 flex items-center justify-center font-mono font-bold text-cyan-300 text-sm flex-shrink-0 shadow-lg">
+            <TiltCard maxTilt={8} className="glass-panel rounded-xl p-6 border border-zinc-800 bg-[var(--card-bg)]/85 flex gap-5 items-start">
+              <div className="w-14 h-14 rounded-xl bg-zinc-900 border border-zinc-600 flex items-center justify-center font-mono font-bold text-white text-sm flex-shrink-0 shadow-lg">
                 SEC
               </div>
               <div className="space-y-2">
-                <div className="flex items-center gap-2 font-mono text-[11px] text-cyan-400 font-semibold">
-                  <span>CYBERSECURITY &amp; DEFENSIVE SYSTEMS</span>
-                  <span className="text-slate-600">•</span>
-                  <span className="text-emerald-400 font-semibold">APPLIED CRYPTOGRAPHY</span>
+                <div className="flex items-center gap-2 font-mono text-[11px] text-zinc-300 font-semibold">
+                  <span className="text-white">CYBERSECURITY &amp; DEFENSIVE SYSTEMS</span>
+                  <span className="text-zinc-600">•</span>
+                  <span className="text-zinc-200 border border-zinc-700 px-1.5 py-0.5 rounded text-[10px]">APPLIED CRYPTOGRAPHY</span>
                 </div>
                 <h3 className="font-heading font-bold text-lg text-[var(--text-primary)]">Cybersecurity Enthusiast &amp; Cryptographic Architecture</h3>
-                <p className="text-slate-300 text-xs leading-relaxed">
+                <p className="text-zinc-300 text-xs leading-relaxed">
                   Hands-on implementations of high-entropy cryptographic ciphers (AES-256 GCM), spatial pixel permutation diffusion, access control lists (ACLs), Wireshark packet auditing, and zero-trust security postures.
                 </p>
-                <div className="font-mono text-[11px] text-slate-500 pt-1 flex items-center gap-2">
+                <div className="font-mono text-[11px] text-zinc-500 pt-1 flex items-center gap-2">
                   <span>STATUS: ACTIVE DEFENSIVE RESEARCH</span>
                 </div>
               </div>
             </TiltCard>
           </div>
         </section>
+        </AnimatedContent>
 
         {/* SECTION 06: CLI TERMINAL */}
-        <section id="terminal-section" className="space-y-4 scroll-mt-24">
+        <AnimatedContent distance={80} direction="vertical" duration={0.85} threshold={0.15}>
+          <section id="terminal-section" className="space-y-4 scroll-mt-24">
           <div className="flex items-center justify-between">
-            <span className="font-mono text-xs text-cyan-400 font-semibold">&gt; INTERACTIVE_TERMINAL // DARSHAN_SHELL</span>
-            <span className="font-mono text-[11px] text-slate-500">TYPE 'help' FOR SUBROUTINES</span>
+            <span className="font-mono text-xs text-white font-semibold">&gt; INTERACTIVE_TERMINAL // DARSHAN_SHELL</span>
+            <span className="font-mono text-[11px] text-zinc-500">TYPE 'help' FOR SUBROUTINES</span>
           </div>
 
-          <div className="rounded-xl border border-cyan-500/30 bg-[#050914] shadow-2xl p-4 font-mono text-xs text-slate-200">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800 text-[11px] text-slate-500">
+          <div className="rounded-xl border border-zinc-700 bg-black shadow-2xl p-4 font-mono text-xs text-zinc-200">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-800 text-[11px] text-zinc-500">
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-red-500/80"></span>
-                <span className="w-3 h-3 rounded-full bg-yellow-500/80"></span>
-                <span className="w-3 h-3 rounded-full bg-emerald-500/80"></span>
-                <span className="ml-2 text-slate-400 font-bold">darshan@workstation:~$</span>
+                <span className="w-3 h-3 rounded-full bg-zinc-700"></span>
+                <span className="w-3 h-3 rounded-full bg-zinc-500"></span>
+                <span className="w-3 h-3 rounded-full bg-white"></span>
+                <span className="ml-2 text-zinc-400 font-bold">darshan@workstation:~$</span>
               </div>
-              <span className="text-cyan-400">REACT_SHELL_EMULATOR</span>
+              <span className="text-white font-semibold">REACT_SHELL_EMULATOR</span>
             </div>
 
-            <div className="py-3 space-y-1.5 max-h-64 overflow-y-auto font-mono text-xs text-slate-300">
+            <div ref={terminalContainerRef} className="py-3 space-y-1.5 max-h-64 overflow-y-auto font-mono text-xs text-zinc-300">
               {terminalHistory.map((line, idx) => (
-                <div key={idx} className={line.type === 'err' ? 'text-red-400' : line.type === 'user' ? 'text-cyan-400 font-bold' : line.type === 'sys' ? 'text-slate-500' : 'text-slate-200'}>
+                <div key={idx} className={line.type === 'err' ? 'text-zinc-400 font-bold underline' : line.type === 'user' ? 'text-white font-bold' : line.type === 'sys' ? 'text-zinc-500' : 'text-zinc-200'}>
                   <pre className="font-mono whitespace-pre-wrap">{line.text}</pre>
                 </div>
               ))}
-              <div ref={terminalBottomRef}></div>
             </div>
 
-            <div className="pt-2 pb-2 flex flex-wrap gap-1.5 border-t border-slate-800/60 text-[11px]">
-              <span className="text-slate-500 mr-1 self-center">QUICK EXEC:</span>
+            <div className="pt-2 pb-2 flex flex-wrap gap-1.5 border-t border-zinc-800/80 text-[11px]">
+              <span className="text-zinc-500 mr-1 self-center">QUICK EXEC:</span>
               {['help', 'bio', 'workflow', 'projects', 'skills', 'credentials', 'theme', 'photo', 'contact', 'clear'].map(cmd => (
                 <button 
                   key={cmd}
                   onClick={() => executeTerminalCommand(cmd)}
-                  className="px-2 py-0.5 rounded bg-[#091224] hover:bg-cyan-950 border border-slate-700/80 hover:border-cyan-500/60 text-slate-300 hover:text-cyan-300 transition-colors cursor-pointer"
+                  className="px-2 py-0.5 rounded bg-zinc-900 hover:bg-white hover:text-black border border-zinc-700 hover:border-white text-zinc-300 transition-colors cursor-pointer"
                 >
                   {cmd}
                 </button>
               ))}
             </div>
 
-            <form onSubmit={handleTerminalSubmit} className="flex items-center gap-2 pt-2 border-t border-slate-800">
-              <span className="text-cyan-400 font-bold">&gt;</span>
+            <form onSubmit={handleTerminalSubmit} className="flex items-center gap-2 pt-2 border-t border-zinc-800">
+              <span className="text-white font-bold">&gt;</span>
               <input 
                 type="text" 
                 value={terminalInput}
                 onChange={(e) => setTerminalInput(e.target.value)}
-                className="bg-transparent flex-1 outline-none text-cyan-300 font-mono text-xs placeholder-slate-600"
+                className="bg-transparent flex-1 outline-none text-white font-mono text-xs placeholder-zinc-600"
                 placeholder="Type command (e.g. 'workflow', 'bio', 'theme', 'help')..."
                 autoComplete="off"
                 spellCheck="false"
               />
-              <button type="submit" className="text-[11px] text-slate-400 hover:text-cyan-400 font-mono cursor-pointer">[EXEC]</button>
+              <button type="submit" className="text-[11px] text-zinc-400 hover:text-white font-mono cursor-pointer">[EXEC]</button>
             </form>
           </div>
         </section>
+        </AnimatedContent>
 
         {/* SECTION 07: CONTACT */}
-        <section id="contact" className="space-y-8 scroll-mt-24 pt-4">
+        <AnimatedContent distance={80} direction="vertical" duration={0.85} threshold={0.15}>
+          <section id="contact" className="space-y-8 scroll-mt-24 pt-4">
           <div className="flex items-center gap-3">
-            <span className="font-mono text-xs text-cyan-400 font-semibold">07. // INITIALIZE COMMUNICATIONS</span>
-            <div className="h-px bg-slate-800 flex-1"></div>
+            <span className="font-mono text-xs text-white font-semibold">07. // INITIALIZE COMMUNICATIONS</span>
+            <div className="h-px bg-zinc-800 flex-1"></div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-5 space-y-4">
               <h2 className="font-heading font-extrabold text-3xl text-[var(--text-primary)]">Let's Build Mission-Critical Tech Together.</h2>
-              <p className="text-slate-300 text-sm leading-relaxed">
+              <p className="text-zinc-300 text-sm leading-relaxed">
                 Available for software engineering roles, cybersecurity initiatives, and networking infrastructure consulting. Feel free to initiate a handshake.
               </p>
 
               <div className="space-y-3 font-mono text-xs pt-3">
-                <div className="p-3.5 rounded-lg bg-[var(--surface-low)] border border-slate-800 flex items-center justify-between">
+                <div className="p-3.5 rounded-lg bg-[var(--surface-low)] border border-zinc-800 flex items-center justify-between">
                   <div>
-                    <span className="text-cyan-400 block text-[10px]">DIRECT EMAIL DISPATCH</span>
+                    <span className="text-zinc-400 block text-[10px]">DIRECT EMAIL DISPATCH</span>
                     <span className="text-[var(--text-primary)] font-semibold">darshan.dev.portfolio@gmail.com</span>
                   </div>
                   <button 
                     onClick={copyEmailToClipboard}
-                    className="px-2.5 py-1 rounded bg-slate-800 hover:bg-cyan-900 border border-slate-700 text-cyan-300 text-[11px] transition-colors cursor-pointer"
+                    className="px-2.5 py-1 rounded bg-zinc-800 hover:bg-white hover:text-black border border-zinc-700 text-white text-[11px] transition-colors cursor-pointer"
                   >
                     {copiedEmail ? 'COPIED! ✓' : 'COPY'}
                   </button>
                 </div>
 
-                <div className="p-3.5 rounded-lg bg-[var(--surface-low)] border border-slate-800">
-                  <span className="text-cyan-400 block text-[10px]">CURRENT AVAILABILITY</span>
-                  <span className="text-emerald-400 flex items-center gap-1.5 font-semibold mt-0.5">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <div className="p-3.5 rounded-lg bg-[var(--surface-low)] border border-zinc-800">
+                  <span className="text-zinc-400 block text-[10px]">CURRENT AVAILABILITY</span>
+                  <span className="text-white flex items-center gap-1.5 font-semibold mt-0.5">
+                    <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
                     ACTIVE FOR OPPORTUNITIES (REMOTE &amp; HYBRID)
                   </span>
                 </div>
 
-                <div className="p-3.5 rounded-lg bg-[var(--surface-low)] border border-slate-800">
-                  <span className="text-cyan-400 block text-[10px]">CORE ACCREDITATION</span>
-                  <span className="text-slate-300">Cisco Certified Network Associate (CCNA)</span>
+                <div className="p-3.5 rounded-lg bg-[var(--surface-low)] border border-zinc-800">
+                  <span className="text-zinc-400 block text-[10px]">CORE ACCREDITATION</span>
+                  <span className="text-zinc-300">Cisco Certified Network Associate (CCNA)</span>
                 </div>
               </div>
             </div>
 
             <div className="lg:col-span-7">
               <TiltCard maxTilt={5}>
-                <div className="glass-panel rounded-2xl border border-slate-800 bg-[var(--card-bg)]/90 p-6 sm:p-8">
+                <div className="glass-panel rounded-2xl border border-zinc-800 bg-[var(--card-bg)]/90 p-6 sm:p-8">
                   <form onSubmit={handleContactSubmit} className="space-y-4 font-mono text-xs">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-1.5">
-                        <label className="text-slate-400 block" htmlFor="form-name">DISPATCHER_NAME</label>
+                        <label className="text-zinc-400 block" htmlFor="form-name">DISPATCHER_NAME</label>
                         <input 
                           type="text" 
                           id="form-name"
                           required 
                           value={contactForm.name}
                           onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                          className="w-full bg-[var(--surface-low)] border border-slate-700/80 rounded-lg px-3.5 py-2.5 text-[var(--text-primary)] focus:border-cyan-400 focus:outline-none transition-colors" 
+                          className="w-full bg-[var(--surface-low)] border border-zinc-700/80 rounded-lg px-3.5 py-2.5 text-[var(--text-primary)] focus:border-white focus:outline-none transition-colors" 
                           placeholder="e.g. Alex Mercer"
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-slate-400 block" htmlFor="form-email">RETURN_EMAIL</label>
+                        <label className="text-zinc-400 block" htmlFor="form-email">RETURN_EMAIL</label>
                         <input 
                           type="email" 
                           id="form-email"
                           required 
                           value={contactForm.email}
                           onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                          className="w-full bg-[var(--surface-low)] border border-slate-700/80 rounded-lg px-3.5 py-2.5 text-[var(--text-primary)] focus:border-cyan-400 focus:outline-none transition-colors" 
+                          className="w-full bg-[var(--surface-low)] border border-zinc-700/80 rounded-lg px-3.5 py-2.5 text-[var(--text-primary)] focus:border-white focus:outline-none transition-colors" 
                           placeholder="a.mercer@enterprise.io"
                         />
                       </div>
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-slate-400 block" htmlFor="form-subject">INITIATIVE_SUBJECT</label>
+                      <label className="text-zinc-400 block" htmlFor="form-subject">INITIATIVE_SUBJECT</label>
                       <input 
                         type="text" 
                         id="form-subject"
                         required 
                         value={contactForm.subject}
                         onChange={(e) => setContactForm({ ...contactForm, subject: e.target.value })}
-                        className="w-full bg-[var(--surface-low)] border border-slate-700/80 rounded-lg px-3.5 py-2.5 text-[var(--text-primary)] focus:border-cyan-400 focus:outline-none transition-colors" 
+                        className="w-full bg-[var(--surface-low)] border border-zinc-700/80 rounded-lg px-3.5 py-2.5 text-[var(--text-primary)] focus:border-white focus:outline-none transition-colors" 
                         placeholder="Software Role / Cybersecurity & Infrastructure Inquiry"
                       />
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-slate-400 block" htmlFor="form-message">TRANSMISSION_PAYLOAD</label>
+                      <label className="text-zinc-400 block" htmlFor="form-message">TRANSMISSION_PAYLOAD</label>
                       <textarea 
                         id="form-message"
                         rows="4" 
                         required 
                         value={contactForm.message}
                         onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                        className="w-full bg-[var(--surface-low)] border border-slate-700/80 rounded-lg px-3.5 py-2.5 text-[var(--text-primary)] focus:border-cyan-400 focus:outline-none transition-colors resize-none" 
+                        className="w-full bg-[var(--surface-low)] border border-zinc-700/80 rounded-lg px-3.5 py-2.5 text-[var(--text-primary)] focus:border-white focus:outline-none transition-colors resize-none" 
                         placeholder="Project requirements, role description, or collaboration context..."
                       ></textarea>
                     </div>
@@ -1187,7 +1188,7 @@ Status  : Open for Engineering Roles & Cybersecurity Inquiries`
                     <button 
                       type="submit" 
                       disabled={formStatus === 'sending'}
-                      className="w-full py-3.5 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 text-white font-heading font-semibold text-xs tracking-wider transition-all shadow-lg shadow-blue-600/30 hover:shadow-cyan-400/40 border border-blue-400/40 cursor-pointer flex items-center justify-center gap-2"
+                      className="w-full py-3.5 rounded-lg bg-white hover:bg-zinc-200 disabled:bg-zinc-800 text-black disabled:text-zinc-500 font-heading font-bold text-xs tracking-wider transition-all shadow-lg border border-white cursor-pointer flex items-center justify-center gap-2"
                     >
                       {formStatus === 'sending' ? (
                         <span>TRANSMITTING DISPATCH PACKET...</span>
@@ -1197,7 +1198,7 @@ Status  : Open for Engineering Roles & Cybersecurity Inquiries`
                     </button>
 
                     {formStatus === 'success' && (
-                      <div className="bg-emerald-950/50 border border-emerald-500/50 p-3 rounded-lg text-center text-emerald-400 font-mono text-xs animate-fadeIn">
+                      <div className="bg-zinc-900 border border-white p-3 rounded-lg text-center text-white font-mono text-xs animate-fadeIn">
                         ✓ DISPATCH PACKET DELIVERED SUCCESSFULLY. Thank you, Darshan will reply within 24 hours.
                       </div>
                     )}
@@ -1207,6 +1208,7 @@ Status  : Open for Engineering Roles & Cybersecurity Inquiries`
             </div>
           </div>
         </section>
+        </AnimatedContent>
 
       </main>
 
@@ -1214,7 +1216,7 @@ Status  : Open for Engineering Roles & Cybersecurity Inquiries`
       {showScrollTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-6 right-6 z-50 p-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white shadow-xl shadow-blue-600/30 border border-blue-400/40 font-mono text-xs flex items-center gap-1.5 transition-all animate-bounce cursor-pointer"
+          className="fixed bottom-6 right-6 z-50 p-3 rounded-xl bg-white hover:bg-zinc-200 text-black shadow-xl border border-white font-mono text-xs font-bold flex items-center gap-1.5 transition-all animate-bounce cursor-pointer"
           title="Return to top"
         >
           <span>↑ TOP</span>
@@ -1222,16 +1224,16 @@ Status  : Open for Engineering Roles & Cybersecurity Inquiries`
       )}
 
       {/* Footer */}
-      <footer className="border-t border-slate-800/80 bg-[var(--surface)] mt-24 py-8 font-mono text-xs text-slate-500">
+      <footer className="border-t border-zinc-800/80 bg-[var(--surface)] mt-24 py-8 font-mono text-xs text-zinc-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
+            <span className="w-2 h-2 rounded-full bg-white"></span>
             <span>© 2026 DARSHAN S. ALL ARCHITECTURAL RIGHTS RESERVED.</span>
           </div>
-          <div className="flex items-center gap-6 text-slate-400">
-            <a href="#hero" onClick={() => triggerSound(700)} className="hover:text-cyan-400 transition-colors">TOP_OF_PAGE ↑</a>
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-cyan-400 transition-colors">GITHUB</a>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-cyan-400 transition-colors">LINKEDIN</a>
+          <div className="flex items-center gap-6 text-zinc-400">
+            <a href="#hero" onClick={() => triggerSound(700)} className="hover:text-white transition-colors">TOP_OF_PAGE ↑</a>
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">GITHUB</a>
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">LINKEDIN</a>
           </div>
         </div>
       </footer>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import TiltCard from './TiltCard';
+import GradientText from './GradientText';
 
 export default function WorkflowSection({ triggerSound }) {
   const [activeStep, setActiveStep] = useState(0);
@@ -117,20 +118,27 @@ verify_entropy(ciphertext) # > 7.999`,
     <section id="workflow" className="space-y-8 scroll-mt-24">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          <span className="font-mono text-xs text-cyan-400 font-semibold">
+          <span className="font-mono text-xs text-zinc-300 font-semibold tracking-wider">
             02. // HARDENED METHODOLOGY
           </span>
-          <h2 className="font-heading font-extrabold text-3xl text-[var(--text-primary)]">
-            Cybersecurity &amp; Engineering Workflow
+          <h2 className="font-heading font-extrabold text-3xl sm:text-4xl text-[var(--text-primary)]">
+            <GradientText
+              colors={["#7cff67", "#B497CF", "#5227FF"]}
+              animationSpeed={6}
+              variant="flow"
+              glow={0.35}
+            >
+              Cybersecurity &amp; Engineering Workflow
+            </GradientText>
           </h2>
         </div>
 
         <button
           onClick={runAutomatedWorkflow}
           disabled={isAutomating}
-          className="px-4 py-2 rounded-lg bg-cyan-950/80 border border-cyan-500/50 hover:bg-cyan-900/60 text-cyan-300 font-mono text-xs transition-all shadow-lg shadow-cyan-950/40 flex items-center gap-2 cursor-pointer self-start sm:self-auto"
+          className="px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-700 hover:border-white hover:bg-zinc-800 text-white font-mono text-xs transition-all shadow-lg shadow-black/40 flex items-center gap-2 cursor-pointer self-start sm:self-auto"
         >
-          <span className={`w-2 h-2 rounded-full ${isAutomating ? 'bg-amber-400 animate-ping' : 'bg-cyan-400'}`}></span>
+          <span className={`w-2 h-2 rounded-full ${isAutomating ? 'bg-white animate-ping' : 'bg-white'}`}></span>
           <span>{isAutomating ? 'EXECUTING PIPELINE...' : '[ SIMULATE COMPLETE PIPELINE ]'}</span>
         </button>
       </div>
@@ -146,15 +154,15 @@ verify_entropy(ciphertext) # > 7.999`,
             }}
             className={`p-3 rounded-xl border text-left transition-all cursor-pointer relative overflow-hidden ${
               activeStep === idx
-                ? 'bg-blue-600/20 border-cyan-400 text-white shadow-lg shadow-cyan-500/10'
-                : 'bg-[var(--surface-low)] border-slate-800 text-slate-400 hover:border-slate-700 hover:text-white'
+                ? 'bg-zinc-800/80 border-white text-white shadow-lg shadow-white/5'
+                : 'bg-[var(--surface-low)] border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:text-white'
             }`}
           >
             <div className="flex items-center justify-between mb-1">
-              <span className={`text-[10px] font-bold ${activeStep === idx ? 'text-cyan-400' : 'text-slate-500'}`}>
+              <span className={`text-[10px] font-bold ${activeStep === idx ? 'text-white' : 'text-zinc-500'}`}>
                 STAGE {ws.step}
               </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 opacity-60"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-white opacity-80"></span>
             </div>
             <div className="text-xs font-semibold truncate text-[var(--text-primary)]">
               {ws.phase}
@@ -165,43 +173,43 @@ verify_entropy(ciphertext) # > 7.999`,
 
       {/* Main Active Stage Interactive Telemetry Display */}
       <TiltCard maxTilt={5}>
-        <div className="glass-panel rounded-2xl border border-slate-800 bg-[var(--card-bg)]/90 p-6 sm:p-8 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+        <div className="glass-panel rounded-2xl border border-zinc-800 bg-[var(--card-bg)]/90 p-6 sm:p-8 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-4">
             <div>
-              <div className="flex items-center gap-2 font-mono text-xs text-cyan-400 font-semibold">
-                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+              <div className="flex items-center gap-2 font-mono text-xs text-zinc-300 font-semibold">
+                <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
                 ACTIVE PIPELINE STAGE // {current.phase}
               </div>
               <h3 className="font-heading font-bold text-xl sm:text-2xl text-[var(--text-primary)] mt-1">
                 {current.title}
               </h3>
             </div>
-            <span className="font-mono text-xs px-3 py-1 rounded bg-emerald-950/70 border border-emerald-500/50 text-emerald-300 font-semibold self-start sm:self-auto">
+            <span className="font-mono text-xs px-3 py-1 rounded bg-zinc-900 border border-zinc-700 text-zinc-200 font-semibold self-start sm:self-auto">
               {current.status}
             </span>
           </div>
 
-          <p className="text-slate-300 text-sm leading-relaxed max-w-3xl">
+          <p className="text-zinc-300 text-sm leading-relaxed max-w-3xl">
             {current.summary}
           </p>
 
           {/* Metrics row */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs">
             {Object.entries(current.metrics).map(([key, val], i) => (
-              <div key={i} className="bg-[var(--surface-low)] p-3 rounded-lg border border-slate-800">
-                <span className="text-slate-500 block text-[10px] uppercase">{key}</span>
-                <span className="text-cyan-400 font-semibold">{val}</span>
+              <div key={i} className="bg-[var(--surface-low)] p-3 rounded-lg border border-zinc-800">
+                <span className="text-zinc-500 block text-[10px] uppercase">{key}</span>
+                <span className="text-white font-semibold">{val}</span>
               </div>
             ))}
           </div>
 
           {/* Interactive Code Viewer for this Stage */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between font-mono text-[11px] text-slate-400">
-              <span className="text-cyan-400">&gt; HARDENED_EXECUTION_MODULE:</span>
+            <div className="flex items-center justify-between font-mono text-[11px] text-zinc-400">
+              <span className="text-zinc-300">&gt; HARDENED_EXECUTION_MODULE:</span>
               <span>SYNCHRONOUS COMPILATION</span>
             </div>
-            <div className="bg-[#050914] rounded-xl border border-slate-800 p-4 font-mono text-xs text-cyan-300/90 overflow-x-auto shadow-inner">
+            <div className="bg-[#050505] rounded-xl border border-zinc-800 p-4 font-mono text-xs text-zinc-200 overflow-x-auto shadow-inner">
               <pre className="whitespace-pre">{current.codeSnippet}</pre>
             </div>
           </div>
